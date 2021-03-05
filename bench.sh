@@ -3,9 +3,13 @@
 PYTHON=python3
 FIND=find
 HOST=$(hostname) || exit 1
+REV=master
 
-while getopts "h:p:f:" OPTION; do
+while getopts "h:p:f:r:" OPTION; do
     case $OPTION in
+    r)
+        REV=$OPTARG
+        ;;
     h)
         HOST=$OPTARG
         ;;
@@ -26,15 +30,29 @@ done
 if [[ ! -d "woosh" ]]; then
     git clone "https://github.com/esoma/woosh.git" || exit 1
 fi 
-#git -C woosh reset HEAD --hard || exit 1
-#git -C woosh clean -fd || exit 1
-#git -C woosh fetch || exit 1
-#git -C woosh pull || exit 1
+git -C woosh reset master --hard || exit 1
+git -C woosh clean -fd || exit 1
+git -C woosh fetch || exit 1
+echo "REV=$REV"
+git -C woosh checkout $REV
 REV=$(git -C woosh rev-parse HEAD) || exit 1
 
-# make sure the directory exists to house the results for this rev
+# skip benchmarks if we already have the results
 RAW_REV="raw/$REV"
+RAW_REV_HOST_JSON="$RAW_REV/$HOST.json"
+if [[ -f "$RAW_REV_HOST_JSON" ]]; then
+    echo "skipping $RAW_REV_HOST_JSON...results already exist"
+    exit 0
+fi
+
+# make sure the directory exists to house the results for this rev
 mkdir -p "$RAW_REV" || exit 1
+
+# run benchmarks
+if [[ -d "tmp" ]]; then
+    rm -rf "tmp" || exit 1
+fi
+mkdir -p "tmp" || exit 1
 
 # setup the python virtual environment
 $PYTHON -m venv _env
@@ -47,18 +65,9 @@ else
 fi
 pip install pyperf psutil virtualenv Cython || exit 1
 
-# run benchmarks
-RAW_HOST_REV_JSON="$RAW_HOST/$REV.json"
-if [[ -d "tmp" ]]; then
-    rm -rf "tmp" || exit 1
-fi
-mkdir -p "tmp" || exit 1
-if [[ -f "$RAW_HOST_REV_JSON" ]]; then
-    echo "skipping $RAW_HOST_REV_JSON...results already exist"
-fi
-
 # find woosh benchmark runners
 WOOSH_BENCHMARKS=$($FIND woosh/bench -name "bench-woosh-*.py")
+RESULTS=""
 
 # woosh with no pgo
 (cd woosh && python setup.py build_ext -f install && cd ..) || exit 1
@@ -68,6 +77,7 @@ for WOOSH_BENCHMARK in $WOOSH_BENCHMARKS; do
         rm "$JSON" || exit 1
     fi
     python $WOOSH_BENCHMARK -o "$JSON" || exit 1
+    RESULTS="$RESULTS $JSON"
 done
 
 # woosh with pgo
@@ -79,6 +89,7 @@ for WOOSH_BENCHMARK in $WOOSH_BENCHMARKS; do
         rm "$JSON" || exit 1
     fi
     python $WOOSH_BENCHMARK -o "$JSON" || exit 1
+    RESULTS="$RESULTS $JSON"
 done
 
 # cpytoken with pgo
@@ -91,6 +102,7 @@ for CPYTOKEN_BENCHMARK in $CPYTOKEN_BENCHMARKS; do
         rm "$JSON" || exit 1
     fi
     python $CPYTOKEN_BENCHMARK -o "$JSON" || exit 1
+    RESULTS="$RESULTS $JSON"
 done
 
 # tokenize
@@ -101,6 +113,7 @@ for TOKENIZE_BENCHMARK in $TOKENIZE_BENCHMARKS; do
         rm "$JSON" || exit 1
     fi
     python $TOKENIZE_BENCHMARK -o "$JSON" || exit 1
+    RESULTS="$RESULTS $JSON"
 done
 
 # cython
@@ -111,4 +124,12 @@ for CYTHON_BENCHMARK in $CYTHON_BENCHMARKS; do
         rm "$JSON" || exit 1
     fi
     python $CYTHON_BENCHMARK -o "$JSON" || exit 1
+    RESULTS="$RESULTS $JSON"
 done
+
+# convert and dump the data
+python convert-pyperf-results.py $RESULTS > $RAW_REV_HOST_JSON || exit 1
+
+# get rid of the temp data
+rm -rf tmp || exit 1
+
