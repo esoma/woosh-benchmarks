@@ -44,6 +44,8 @@ for result_name in args.results:
     platform = result["metadata"]["platform"]
     if 'Windows' in platform:
         platform = 'Windows'
+    elif 'Linux' in platform:
+        platform = 'Linux'
     else:
         sys.stderr.write(f'unknown platform: {platform}')
         sys.exit(1)
