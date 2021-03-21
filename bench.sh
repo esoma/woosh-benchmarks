@@ -69,8 +69,8 @@ pip install pyperf psutil virtualenv Cython || exit 1
 WOOSH_BENCHMARKS=$($FIND woosh/bench -name "bench-woosh-*.py")
 RESULTS=""
 
-# woosh with no pgo
-(cd woosh && python setup.py build_ext -f install && cd ..) || exit 1
+echo "woosh with no pgo"
+(cd woosh && python setup.py install build --pgo-disable -f) || exit 1
 for WOOSH_BENCHMARK in $WOOSH_BENCHMARKS; do
     JSON="tmp/$(basename $WOOSH_BENCHMARK .py).json"
     if [[ -f "$JSON" ]]; then
@@ -80,9 +80,8 @@ for WOOSH_BENCHMARK in $WOOSH_BENCHMARKS; do
     RESULTS="$RESULTS $JSON"
 done
 
-# woosh with pgo
-(cd woosh/pgo && source ./build-msvc.sh) || exit 1
-(cd woosh && python setup.py install) || exit 1
+echo "woosh with pgo"
+(cd woosh && python setup.py install build --pgo-require -f) || exit 1
 for WOOSH_BENCHMARK in $WOOSH_BENCHMARKS; do
     JSON="tmp/pgo-$(basename $WOOSH_BENCHMARK .py).json"
     if [[ -f "$JSON" ]]; then
@@ -92,9 +91,8 @@ for WOOSH_BENCHMARK in $WOOSH_BENCHMARKS; do
     RESULTS="$RESULTS $JSON"
 done
 
-# cpytoken with pgo
-(cd woosh/cpytoken && source ./pgo-build-msvc.sh) || exit 1
-(cd woosh/cpytoken && python setup.py install) || exit 1
+echo "cpytoken with pgo"
+(cd woosh/cpytoken && python setup.py install build --pgo-require -f) || exit 1
 CPYTOKEN_BENCHMARKS=$($FIND woosh/bench -name "bench-cpytoken-*.py")
 for CPYTOKEN_BENCHMARK in $CPYTOKEN_BENCHMARKS; do
     JSON="tmp/pgo-$(basename $CPYTOKEN_BENCHMARK .py).json"
@@ -105,7 +103,7 @@ for CPYTOKEN_BENCHMARK in $CPYTOKEN_BENCHMARKS; do
     RESULTS="$RESULTS $JSON"
 done
 
-# tokenize
+echo "tokenize"
 TOKENIZE_BENCHMARKS=$($FIND woosh/bench -name "bench-tokenize-*.py")
 for TOKENIZE_BENCHMARK in $TOKENIZE_BENCHMARKS; do
     JSON="tmp/$(basename $TOKENIZE_BENCHMARK .py).json"
@@ -116,7 +114,7 @@ for TOKENIZE_BENCHMARK in $TOKENIZE_BENCHMARKS; do
     RESULTS="$RESULTS $JSON"
 done
 
-# cython
+echo "cython"
 CYTHON_BENCHMARKS=$($FIND woosh/bench -name "bench-cython-*.py")
 for CYTHON_BENCHMARK in $CYTHON_BENCHMARKS; do
     JSON="tmp/$(basename $CYTHON_BENCHMARK .py).json"
@@ -128,8 +126,10 @@ for CYTHON_BENCHMARK in $CYTHON_BENCHMARKS; do
 done
 
 # convert and dump the data
-python convert-pyperf-results.py $RESULTS > $RAW_REV_HOST_JSON || exit 1
-
-# get rid of the temp data
-rm -rf tmp || exit 1
-
+python convert-pyperf-results.py $RESULTS > $RAW_REV_HOST_JSON
+RESULTS_STATUS=$?
+rm -rf tmp
+if [[ $RESULTS_STATUS != 0 ]]; then
+    rm $RAW_REV_HOST_JSON
+    exit 1
+fi
