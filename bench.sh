@@ -32,7 +32,7 @@ if [[ ! -d "woosh" ]]; then
 fi 
 git -C woosh reset master --hard || exit 1
 git -C woosh clean -fd || exit 1
-git -C woosh fetch || exit 1
+git -C woosh pull || exit 1
 echo "REV=$REV"
 git -C woosh checkout $REV
 REV=$(git -C woosh rev-parse HEAD) || exit 1
