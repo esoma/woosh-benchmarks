@@ -39,9 +39,11 @@ for result_name in args.results:
     with open(result_name, 'rb') as result_file:
         result = json.load(result_file)
         
-    # get our platform and hostname
+    # get our metadata
     hostname = result["metadata"]["hostname"]
     platform = result["metadata"]["platform"]
+    python_implementation = result["metadata"]["python_implementation"]
+    python_version = result["metadata"]["python_version"]
     if 'Windows' in platform:
         platform = 'Windows'
     elif 'Linux' in platform:
@@ -54,10 +56,14 @@ for result_name in args.results:
     if not output["metadata"]:
         output["metadata"]["hostname"] = hostname
         output["metadata"]["platform"] = platform
+        output["metadata"]["python_implementation"] = python_implementation
+        output["metadata"]["python_version"] = python_version
     else:
         if (output["metadata"]["hostname"] != hostname or
-            output["metadata"]["platform"] != platform):
-            sys.stderr.write(f'mismatched hostname and platform between files')
+            output["metadata"]["platform"] != platform or 
+            output["metadata"]["python_implementation"] != python_implementation or
+            output["metadata"]["python_version"] != python_version):
+            sys.stderr.write(f'mismatched metadata between files')
             sys.exit(1)
     
     # store the relevant benchmark info
