@@ -91,7 +91,7 @@ for source, source_totals in reversed(sorted(totals.items(), key=lambda kv: kv[0
     rows.insert(0, ['TOTAL', source, *cells])
     
 writer = MarkdownTableWriter(
-    table_name=f'{results["metadata"]["hostname"]}-{results["metadata"]["python_implemenation"]} {results["metadata"]["python_version"]}: {args.rev}',
+    table_name=f'{results["metadata"]["hostname"]}-{results["metadata"]["python_implementation"]} {results["metadata"]["python_version"]}: {args.rev}',
     headers=['Benchmark', 'Source', *tokenizers],
     value_matrix=rows,
 )
