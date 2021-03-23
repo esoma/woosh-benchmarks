@@ -58,6 +58,8 @@ mkdir -p "tmp" || exit 1
 $PYTHON -m venv _env
 if [[ -f "_env/Scripts/activate" ]]; then
     # windows
+    # https://bugs.python.org/issue32451
+    dos2unix _env/Scripts/activate
     source _env/Scripts/activate
 else
     # everything else
