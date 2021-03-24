@@ -65,8 +65,8 @@ else
     # everything else
     source _env/bin/activate
 fi
-pip install -r woosh/requirements.txt || exit 1
-pip install pyperf psutil virtualenv Cython || exit 1
+$PYTHON -m pip install -r woosh/requirements.txt || exit 1
+$PYTHON -m pip install pyperf psutil virtualenv Cython || exit 1
 
 # find woosh benchmark runners
 WOOSH_BENCHMARKS=$($FIND woosh/bench -name "bench-woosh-*.py")
