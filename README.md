@@ -5,22 +5,22 @@ This isn't ready yet, just a quick example:
 # monster (Linux)-cpython 3.9.2 (64-bit): 59e42ec7178c50c58e82d3eac59490bd5858758d
 |    Benchmark    | Source |pgo-woosh |          woosh          |        tokenize         |         cython          |      pgo-cpytoken       |
 |-----------------|--------|----------|-------------------------|-------------------------|-------------------------|-------------------------|
-|TOTAL            |bytes   |333μs     |427μs (1.28x slower)     |                         |3ms (9.86x slower)       |293μs (1.14x faster)     |
-|TOTAL            |bytes-io|382μs     |477μs (1.25x slower)     |7ms (19.59x slower)      |                         |                         |
-|stdlib/abc.py    |bytes   |125μs ±3μs|165μs ±3μs (1.32x slower)|                         |1ms ±18μs (11.20x slower)|101μs ±3μs (1.24x faster)|
-|stdlib/abc.py    |bytes-io|146μs ±3μs|184μs ±4μs (1.26x slower)|2ms ±28μs (17.51x slower)|                         |                         |
-|stdlib/getpass.py|bytes   |208μs ±6μs|262μs ±6μs (1.26x slower)|                         |1ms ±51μs (9.06x slower) |192μs ±4μs (1.08x faster)|
-|stdlib/getpass.py|bytes-io|236μs ±3μs|293μs ±5μs (1.24x slower)|4ms ±79μs (20.88x slower)|                         |                         |
+|TOTAL            |bytes   |191μs     |418μs (2.19x slower)     |                         |2ms (15.56x slower)      |241μs (1.26x slower)     |
+|TOTAL            |bytes-io|239μs     |459μs (1.92x slower)     |6ms (27.24x slower)      |                         |                         |
+|stdlib/abc.py    |bytes   |69μs ±2μs |162μs ±3μs (2.35x slower)|                         |1ms ±27μs (18.29x slower)|84μs ±1μs (1.22x slower) |
+|stdlib/abc.py    |bytes-io|88μs ±2μs |178μs ±2μs (2.02x slower)|2ms ±30μs (25.64x slower)|                         |                         |
+|stdlib/getpass.py|bytes   |122μs ±3μs|256μs ±6μs (2.10x slower)|                         |1ms ±69μs (14.02x slower)|157μs ±3μs (1.29x slower)|
+|stdlib/getpass.py|bytes-io|151μs ±4μs|281μs ±5μs (1.86x slower)|4ms ±48μs (28.17x slower)|                         |                         |
 
 # Fenestra (Linux)-cpython 3.9.2 (64-bit): 59e42ec7178c50c58e82d3eac59490bd5858758d
-|    Benchmark    | Source |pgo-woosh |          woosh          |        tokenize         |          cython           |      pgo-cpytoken      |
-|-----------------|--------|----------|-------------------------|-------------------------|---------------------------|------------------------|
-|TOTAL            |bytes   |179μs     |224μs (1.25x slower)     |                         |1ms (9.60x slower)         |147μs (1.22x faster)    |
-|TOTAL            |bytes-io|205μs     |257μs (1.25x slower)     |3ms (14.98x slower)      |                           |                        |
-|stdlib/abc.py    |bytes   |67μs ±2μs |86μs ±2μs (1.28x slower) |                         |748μs ±21μs (11.16x slower)|51μs ±1μs (1.31x faster)|
-|stdlib/abc.py    |bytes-io|78μs ±2μs |98μs ±3μs (1.26x slower) |1ms ±44μs (13.86x slower)|                           |                        |
-|stdlib/getpass.py|bytes   |112μs ±4μs|138μs ±3μs (1.23x slower)|                         |971μs ±20μs (8.67x slower) |96μs ±3μs (1.17x faster)|
-|stdlib/getpass.py|bytes-io|127μs ±1μs|159μs ±6μs (1.25x slower)|1ms ±26μs (15.67x slower)|                           |                        |
+|    Benchmark    | Source |pgo-woosh|          woosh          |         tokenize          |          cython           |      pgo-cpytoken      |
+|-----------------|--------|---------|-------------------------|---------------------------|---------------------------|------------------------|
+|TOTAL            |bytes   |92μs     |156μs (1.70x slower)     |                           |1ms (17.11x slower)        |129μs (1.40x slower)    |
+|TOTAL            |bytes-io|114μs    |178μs (1.56x slower)     |2ms (24.05x slower)        |                           |                        |
+|stdlib/abc.py    |bytes   |33μs ±0μs|59μs ±1μs (1.79x slower) |                           |674μs ±12μs (20.42x slower)|44μs ±1μs (1.33x slower)|
+|stdlib/abc.py    |bytes-io|42μs ±0μs|68μs ±1μs (1.62x slower) |951μs ±11μs (22.64x slower)|                           |                        |
+|stdlib/getpass.py|bytes   |59μs ±2μs|97μs ±1μs (1.64x slower) |                           |900μs ±19μs (15.25x slower)|85μs ±1μs (1.44x slower)|
+|stdlib/getpass.py|bytes-io|72μs ±2μs|110μs ±1μs (1.53x slower)|1ms ±41μs (24.88x slower)  |                           |                        |
 
 # DESKTOP-P6UEFV2 (Windows)-cpython 3.9.2 (64-bit) revision 1a79785: 59e42ec7178c50c58e82d3eac59490bd5858758d
 |    Benchmark    | Source |pgo-woosh|          woosh          |        tokenize         |          cython          |      pgo-cpytoken      |
