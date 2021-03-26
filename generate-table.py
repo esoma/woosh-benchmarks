@@ -2,7 +2,7 @@
 # humanize
 from humanize import naturaldelta as _naturaldelta
 # pytablewriter
-from pytablewriter import MarkdownTableWriter
+from pytablewriter import HtmlTableWriter
 # python
 import argparse
 from datetime import timedelta
@@ -29,7 +29,7 @@ parser.add_argument('rev', help='woosh revision hash')
 parser.add_argument('hostname', help='host for the benchmark')
 args = parser.parse_args()
 
-with open(os.path.join('raw', args.rev, f'{args.hostname}.json')) as f:
+with open(os.path.join('result', args.rev, f'{args.hostname}.json')) as f:
     results = json.load(f)
     
 tokenizers = ['pgo-woosh', 'woosh', 'tokenize', 'cython', 'pgo-cpytoken']
@@ -60,12 +60,15 @@ for benchmark in results["benchmarks"]:
     
     if benchmark["tokenizer"] != 'pgo-woosh':
         pgo_woosh_mean = pgo_woosh_means[key]
-        if pgo_woosh_mean <= mean:
-            x = mean / pgo_woosh_mean
-            cell += f' ({x:.2f}x slower)'
-        elif pgo_woosh_mean > mean:
-            x = pgo_woosh_mean / mean
-            cell += f' ({x:.2f}x faster)'
+        try:
+            if pgo_woosh_mean <= mean:
+                x = mean / pgo_woosh_mean
+                cell += f' ({x:.2f}x slower)'
+            elif pgo_woosh_mean > mean:
+                x = pgo_woosh_mean / mean
+                cell += f' ({x:.2f}x faster)'
+        except ZeroDivisionError:
+            cell += ' (too small)'
     row[2 + tokenizers.index(benchmark["tokenizer"])] = cell
     total[tokenizers.index(benchmark["tokenizer"])] += mean
     
@@ -90,7 +93,7 @@ for source, source_totals in reversed(sorted(totals.items(), key=lambda kv: kv[0
         cells.append(cell)
     rows.insert(0, ['TOTAL', source, *cells])
     
-writer = MarkdownTableWriter(
+writer = HtmlTableWriter(
     table_name=f'{results["metadata"]["hostname"]} ({results["metadata"]["platform"]})-{results["metadata"]["python_implementation"]} {results["metadata"]["python_version"]}: {args.rev}',
     headers=['Benchmark', 'Source', *tokenizers],
     value_matrix=rows,

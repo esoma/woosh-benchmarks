@@ -38,7 +38,7 @@ git -C woosh checkout $REV
 REV=$(git -C woosh rev-parse HEAD) || exit 1
 
 # skip benchmarks if we already have the results
-RAW_REV="raw/$REV"
+RAW_REV="result/$REV"
 RAW_REV_HOST_JSON="$RAW_REV/$HOST.json"
 if [[ -f "$RAW_REV_HOST_JSON" ]]; then
     echo "skipping $RAW_REV_HOST_JSON...results already exist"
